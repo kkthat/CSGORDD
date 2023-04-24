@@ -36,6 +36,7 @@ services:
           - WAITTIME=60
           - FINISHEDWAITTIME=1200
           - ENABLEDEBUGGING=FALSE
+          - DOWNLOADSPEED=0
       volumes:
         - /path/to/storage/config:/config
         - /path/to/storage/demos:/downloadeddemos
@@ -63,3 +64,5 @@ To run csgordd you will need to edit the following environment variables in your
 `FINISHEDWAITTIME` This is the interval the program waits after downloading all demos. Default is 1200 seconds / 20 minutes
 
 `ENABLEDEBUGGING` When set to TRUE this will enable the debug output. Default is FALSE
+
+`DOWNLOADSPEED` This is your download speed limit in mbps. Default is 0

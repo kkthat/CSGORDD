@@ -17,7 +17,8 @@ accountusername = os.environ['USERNAME']
 accountpassword = os.environ['PASSWORD']
 FINISHEDWAITTIME = os.environ['FINISHEDWAITTIME']
 WAITTIME = os.environ['WAITTIME']
-ENABLEDEBUGGING = os.environ['ENABLEDEBUGGING']
+ENABLEDEBUGGING = str(os.environ['ENABLEDEBUGGING'])
+download_speed = int(os.environ['DOWNLOADSPEED'])
 
 # Define the name of the demos folder and files to save the codes and urls to
 two_factor_secret_file = "/config/secret.json"
@@ -35,14 +36,13 @@ WAITTIMEINT = int(WAITTIME)
 # Ignore this too its to make sure the printed times are strings
 FINISHEDWAITTIMESTR = str(FINISHEDWAITTIME)
 WAITTIMESTR = str(WAITTIME)
-# Ignore this aswell its for checking if debugging is enabled or not
-ENABLEDEBUGGINGSTR = str(ENABLEDEBUGGING)
-if ENABLEDEBUGGINGSTR == "TRUE":
+# Ignore this also just checking if debugging is enabled
+if ENABLEDEBUGGING == "TRUE":
     print("Debugging Enabled!!")
     logging.basicConfig(format='[%(asctime)s] %(levelname)s %(name)s: %(message)s', level=logging.DEBUG)
 else:
     pass
-# Ignore this also its to check if a 2fa file is found and enable the 2fa login stuff
+# Ignore this aswell its to check if a 2fa file is found and enable the 2fa login stuff
     if os.path.isfile(two_factor_secret_file):
         two_f_a_detected = 1
         print("2FA Detected")
@@ -52,6 +52,13 @@ else:
     else:
         two_f_a_detected = 0
         print("2FA NOT Detected")
+# Ignore this its just checking if there is a download speed limit set
+if download_speed == 0:
+    mbps = 1000
+    print("No Download Speed Limit")
+else:
+    mbps = download_speed
+    print("Download Speed Capped To" ,download_speed, "mbps")
 
 # Talk to steam API to get next match share code
 def get_next_match_code(apikey, steamid, steamidkey, knownsharecode):
@@ -195,9 +202,13 @@ def download_demo(finalurl):
     else:
         # if file does not exist, download it
         print('Downloading demo...')
-        response = requests.get(finalurl)
-        with open(download_file_path, 'wb') as f:
-            f.write(response.content)
+        chunk_size = 1024
+        with requests.get(finalurl, stream=True) as r:
+            r.raise_for_status()
+            with open(download_file_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=chunk_size):
+                    f.write(chunk)
+                    time.sleep(chunk_size / (mbps * 1024 * 1024 / 8))
         print('Demo downloaded.')
 
 

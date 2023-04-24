@@ -35,6 +35,7 @@ ENV PASSWORD=
 ENV WAITTIME=60
 ENV FINISHEDWAITTIME=1200
 ENV ENABLEDEBUGGING=False
+ENV DOWNLOADSPEED=0
 
 # Run my *super cool program*
 CMD [ "python3" , "main.py" ]
